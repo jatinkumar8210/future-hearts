@@ -151,14 +151,7 @@ useEffect(() => {
     ]);
 
     setMessage("");
-  }if(videoCall){
-  return (
-    <VideoCall
-      room={room}
-      onLeave={() => setVideoCall(false)}
-    />
-  );
-}
+  }
 
   if (!session) {
 
@@ -334,7 +327,13 @@ useEffect(() => {
   Logout
 </button>
 <button
-  onClick={() => setVideoCall(true)}
+  <button
+  onClick={() =>
+    window.open(
+      `/video?room=${encodeURIComponent(room)}`,
+      "_blank"
+    )
+  }
   style={{
     padding:"10px",
     border:"none",

@@ -46,9 +46,24 @@ onLeaveRoom: () => {
   };
 
   return (
+  <>
+    <button
+      onClick={() => window.location.reload()}
+      style={{
+        position: "fixed",
+        top: "10px",
+        left: "10px",
+        zIndex: 9999,
+        padding: "10px",
+      }}
+    >
+      ← Back to Chat
+    </button>
+
     <div
       ref={myMeeting}
       style={{ width: '100vw', height: '100vh' }}
     />
-  );
+  </>
+);
 }
