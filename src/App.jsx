@@ -78,7 +78,7 @@ useEffect(() => {
 
   const typingChannel = supabase
     .channel("typing-channel")
-
+     console.log("Typing channel created");
     .on(
       "postgres_changes",
       {
@@ -89,21 +89,26 @@ useEffect(() => {
       (payload) => {
 
         const data = payload.new;
-
+        console.log("SESSION =", session);
+console.log("PAYLOAD =", payload);
+        console.log("Typing payload:", data);
         if (
-          data.room === room &&
-          data.email !== session.user.email &&
-          data.typing
-        ) {
-          setTypingUser(`${data.email} is typing...`);
-        } else {
+       session &&
+      data.room === room &&
+      data.email !== session?.user?.email &&
+      data.typing
+       ) {
+        setTypingUser(`${data.email} is typing...`);
+      } else {
           setTypingUser("");
-        }
+       }
 
       }
     )
 
-    .subscribe();
+    .subscribe((status) => {
+  console.log("Typing status:", status);
+});
 
   return () => {
     supabase.removeChannel(typingChannel);
@@ -126,13 +131,13 @@ useEffect(() => {
   await supabase
     .from("typing_status")
     .delete()
-    .eq("email", session.user.email);
+    .eq("email", session?.user?.email);
 
   await supabase
     .from("typing_status")
     .insert([
       {
-        email: session.user.email,
+        email: session?.user?.email,
         room: room,
         typing: value.length > 0,
       },
@@ -161,7 +166,7 @@ async function sendImage(file) {
   await supabase.from("messages").insert([
     {
       text: data.publicUrl,
-      sender: session.user.email,
+      sender: session?.user?.email,
       room: room,
     },
   ]);
@@ -174,7 +179,7 @@ async function sendImage(file) {
     await supabase.from("messages").insert([
       {
         text: message,
-        sender: session.user.email,
+        sender: session?.user?.email,
         room: room,
       },
     ]);
@@ -395,7 +400,7 @@ async function sendImage(file) {
               key={msg.id}
               style={{
                 background:
-                  msg.sender === session.user.email
+                  msg.sender === session?.user?.email
                     ? "#f74ab7"
                     : "#5091f9",
 
@@ -404,7 +409,7 @@ async function sendImage(file) {
                 width:"fit-content",
                 maxWidth:"70%",
                 alignSelf:
-                  msg.sender === session.user.email
+                  msg.sender === session?.user?.email
                   
                     ? "flex-end"
                     : "flex-start"
