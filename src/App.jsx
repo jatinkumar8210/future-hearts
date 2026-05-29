@@ -6,10 +6,12 @@ function App() {
   const [email, setEmail] = useState("");
 const [password, setPassword] = useState("");
   const [session, setSession] = useState(null);
-
+const [image, setImage] = useState(null);
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
-  const [room, setRoom] = useState("");
+  const [room, setRoom] = useState(
+  localStorage.getItem("room") || ""
+);
   const [typingUser, setTypingUser] = useState("");
   const [videoCall, setVideoCall] = useState(false);
   useEffect(() => {
@@ -137,6 +139,33 @@ useEffect(() => {
     ]);
 
 }
+async function sendImage(file) {
+
+  if (!file || room.trim() === "") return;
+
+  const fileName = `${Date.now()}-${file.name}`;
+
+  const { error } = await supabase.storage
+    .from("chat-images")
+    .upload(fileName, file);
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  const { data } = supabase.storage
+    .from("chat-images")
+    .getPublicUrl(fileName);
+
+  await supabase.from("messages").insert([
+    {
+      text: data.publicUrl,
+      sender: session.user.email,
+      room: room,
+    },
+  ]);
+}
   async function sendMessage() {
 
     if (message.trim() === "") return;
@@ -254,7 +283,8 @@ useEffect(() => {
             border:"none",
             borderRadius:"10px"
           }}
-        >
+          >
+        
           Login
         </button>
 
@@ -292,7 +322,10 @@ useEffect(() => {
         <h1>💜 Future Hearts Chat</h1>
         <input
   value={room}
-  onChange={(e)=>setRoom(e.target.value)}
+  onChange={(e) => {
+  setRoom(e.target.value);
+  localStorage.setItem("room", e.target.value);
+}}
    
   placeholder="Enter Couple Room"
   style={{
@@ -326,7 +359,7 @@ useEffect(() => {
 >
   Logout
 </button>
-<button
+
   <button
   onClick={() =>
     window.open(
@@ -377,7 +410,18 @@ useEffect(() => {
                     : "flex-start"
               }}
             >
-              {msg.text}
+              {msg.text.startsWith("http") ? (
+  <img
+    src={msg.text}
+    alt="chat"
+    style={{
+      maxWidth: "250px",
+      borderRadius: "10px"
+    }}
+  />
+) : (
+  msg.text
+)}
             </div>
 
           ))}
@@ -424,6 +468,14 @@ useEffect(() => {
               cursor:"pointer"
             }}
           >
+            <input
+  type="file"
+  accept="image/*"
+  onChange={(e) => {
+    const file = e.target.files[0];
+    sendImage(file);
+  }}
+/>
             Send 💌
           </button>
 
