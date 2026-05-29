@@ -1,7 +1,6 @@
 import { ZegoUIKitPrebuilt } from '@zegocloud/zego-uikit-prebuilt';
 
-export default function VideoCall({ room }) {
-
+export default function VideoCall({ room, onLeave }) {
   const myMeeting = async (element) => {
 
     const appID = 1739099166;
@@ -20,6 +19,9 @@ export default function VideoCall({ room }) {
 
     zp.joinRoom({
       container: element,
+      onLeaveRoom: () => {
+  onLeave();
+},
       sharedLinks: [
         {
           name: 'Personal link',
@@ -32,6 +34,11 @@ export default function VideoCall({ room }) {
             room,
         },
       ],
+      showLeavingView: false,
+
+onLeaveRoom: () => {
+  window.location.reload();
+},
       scenario: {
         mode: ZegoUIKitPrebuilt.OneONoneCall,
       },

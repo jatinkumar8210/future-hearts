@@ -152,7 +152,12 @@ useEffect(() => {
 
     setMessage("");
   }if(videoCall){
-  return <VideoCall room={room} />;
+  return (
+    <VideoCall
+      room={room}
+      onLeave={() => setVideoCall(false)}
+    />
+  );
 }
 
   if (!session) {
