@@ -76,9 +76,10 @@ const [image, setImage] = useState(null);
 }, [room]);
 useEffect(() => {
 
+  console.log("Typing channel created");
   const typingChannel = supabase
     .channel("typing-channel")
-     console.log("Typing channel created");
+     
     .on(
       "postgres_changes",
       {
