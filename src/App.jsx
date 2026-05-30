@@ -73,9 +73,9 @@ const [image, setImage] = useState(null);
     supabase.removeChannel(channel);
   };
 
-}, [room]);
+}, [room,session]);
 useEffect(() => {
-
+    if (!session) return;
   console.log("Typing channel created");
   const typingChannel = supabase
     .channel("typing-channel")
@@ -90,7 +90,8 @@ useEffect(() => {
       (payload) => {
 
         const data = payload.new;
-        console.log("SESSION =", session);
+       console.log("SESSION STATE =", session);
+console.log("APP EMAIL =", session?.user?.email);
 console.log("PAYLOAD =", payload);
         console.log("Typing payload:", data);
         if (
